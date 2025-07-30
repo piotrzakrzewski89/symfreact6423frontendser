@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import {
     Box, Button, Modal, TextField, Checkbox, FormControlLabel, Typography, MenuItem
 } from '@mui/material';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 
 const style = {
     position: 'absolute',
@@ -15,65 +18,140 @@ const style = {
     p: 4,
 };
 
+const userSchema = yup.object().shape({
+    email: yup.string().email('Niepoprawny email').required('Email jest wymagany'),
+    password: yup
+        .string()
+        .required("Hasło jest wymagane")
+        .min(8, "Hasło musi mieć co najmniej 8 znaków")
+        .matches(/[a-z]/, "Hasło musi zawierać małą literę")
+        .matches(/[A-Z]/, "Hasło musi zawierać wielką literę")
+        .matches(/\d/, "Hasło musi zawierać cyfrę")
+        .matches(/[!@#$%^&*(),.?":{}|<>]/, "Hasło musi zawierać znak specjalny"),
+    firstName: yup.string().required('Imię jest wymagane'),
+    lastName: yup.string().required('Nazwisko jest wymagane'),
+    employeeNumber: yup.string().required('Numer pracownika jest wymagany'),
+    isActive: yup.boolean(),
+});
+
+const passwordRequirements = [
+    { label: "Mała litera", test: (pw) => /[a-z]/.test(pw) },
+    { label: "Wielka litera", test: (pw) => /[A-Z]/.test(pw) },
+    { label: "Cyfra", test: (pw) => /\d/.test(pw) },
+    { label: "Znak specjalny", test: (pw) => /[!@#$%^&*(),.?":{}|<>]/.test(pw) },
+    { label: "Min. 8 znaków", test: (pw) => pw.length >= 8 },
+];
+
 const UserCreateModal = ({ open, onClose, onCreate }) => {
-    const [form, setForm] = useState({
-        email: '',
-        password: '',
-        firstName: '',
-        lastName: '', 
-        employeeNumber: '',
-        isActive: 'true',
+    const {
+        register,
+        handleSubmit,
+        reset,
+        watch,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(userSchema),
+        defaultValues: {
+            isActive: true,
+        },
     });
 
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        if (type === 'checkbox') {
-            setForm(prev => ({ ...prev, [name]: checked }));
-        } else {
-            setForm(prev => ({ ...prev, [name]: value }));
-        }
-    };
+    const password = watch('password', '');
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-
-        onCreate(form);
-        setForm({
-            email: '',
-            password: '',
-            firstName: '',
-            lastName: '',
-            employeeNumber: '',
-            isActive: 'true',
-        });
+    const onSubmit = (data) => {
+        onCreate(data);
+        reset();
         onClose();
     };
 
     return (
-        <Modal open={open} onClose={onClose} aria-labelledby='creat-user-modal'>
-            <Box sx={style} component="form" onSubmit={handleSubmit} noValidate>
+        <Modal open={open} onClose={onClose} aria-labelledby="create-user-modal">
+            <Box sx={style} component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
                 <Typography variant="h6" mb={2}>Utwórz nowego użytkownika</Typography>
 
-                <TextField fullWidth label="Email *" name='email' type='email' value={form.email} onChange={handleChange} margin='normal' required />
-
-                <TextField fullWidth label="Hasło *" name='password' type='password' value={form.password} onChange={handleChange} margin='normal' required />
-
-                <TextField fullWidth label="Imię *" name='firstName' value={form.firstName} onChange={handleChange} margin='normal' required />
-
-                <TextField fullWidth label="Nazwisko *" name='lastName' value={form.lastName} onChange={handleChange} margin='normal' required />
-
-                <TextField fullWidth label="Numer Pracownika *" name='employeeNumber' value={form.employeeNumber} onChange={handleChange} margin='normal' required />
-
-                <FormControlLabel control={
-                    <Checkbox checked={form.isActive} onChange={handleChange} name='isActive' />
-
-                }
-                    label='Aktywny'
+                <TextField
+                    fullWidth
+                    label="Email *"
+                    type="email"
+                    margin="normal"
+                    error={!!errors.email}
+                    helperText={errors.email?.message}
+                    {...register("email")}
                 />
 
-                <Box mt={3} display='flex' justifyContent='flex-end' gap={2}>
+                <TextField
+                    fullWidth
+                    label="Hasło *"
+                    type="password"
+                    margin="normal"
+                    error={!!errors.password}
+                    helperText={errors.password?.message}
+                    {...register("password")}
+                />
+
+                <Box mt={1}>
+                    {passwordRequirements.map((rule, idx) => {
+                        const isValid = rule.test(password);
+                        return (
+                            <Typography
+                                key={idx}
+                                variant="body2"
+                                sx={{
+                                    color: isValid ? "green" : "gray",
+                                    display: "flex",
+                                    alignItems: "center",
+                                }}
+                            >
+                                <span style={{ marginRight: 6 }}>
+                                    {isValid ? "✔️" : "❌"}
+                                </span>
+                                {rule.label}
+                            </Typography>
+                        );
+                    })}
+                </Box>
+
+
+                <TextField
+                    fullWidth
+                    label="Imię *"
+                    margin="normal"
+                    error={!!errors.firstName}
+                    helperText={errors.firstName?.message}
+                    {...register("firstName")}
+                />
+
+                <TextField
+                    fullWidth
+                    label="Nazwisko *"
+                    margin="normal"
+                    error={!!errors.lastName}
+                    helperText={errors.lastName?.message}
+                    {...register("lastName")}
+                />
+
+                <TextField
+                    fullWidth
+                    label="Numer Pracownika *"
+                    margin="normal"
+                    error={!!errors.employeeNumber}
+                    helperText={errors.employeeNumber?.message}
+                    {...register("employeeNumber")}
+                />
+
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            defaultChecked={true}
+                            {...register("isActive")}
+                        />
+                    }
+                    label="Aktywny"
+                />
+
+                <Box mt={3} display="flex" justifyContent="flex-end" gap={2}>
                     <Button onClick={onClose}>Anuluj</Button>
-                    <Button type='submit' variant='contained' color='primary'>Utwórz</Button>
+                    <Button type="submit" variant="contained" color="primary">Utwórz</Button>
                 </Box>
             </Box>
         </Modal>

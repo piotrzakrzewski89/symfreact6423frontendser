@@ -1,35 +1,30 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../auth/useAuth';
 import UserTable from '../components/UserTable';
 import UserCreateModal from '../components/UserCreateModal';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { fetchUsers, createUser } from '../api/users';
 
 const Home = () => {
   const { user } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const openModal = () => setModalOpen(true);
-
-  const handleCreateUser = async (userData) => {
+  const getUsers = async () => {
+    setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/new-user`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData),
-      });
-
-      if (!res.ok) {
-        console.error('Błąd przy tworzeniu użytkownika');
-        return;
-      }
-
-      await fetchUsers(); // <- odśwież listę
-      setModalOpen(false); // <- zamknij modal po sukcesie
+      const data = await fetchUsers();
+      setUsers(data);
     } catch (err) {
-      console.error('Błąd sieci:', err);
+      console.error('Błąd ładowania użytkowników ', err);
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    getUsers();
+  }, []);
 
   return (
     <div className="mt-5 text-center">
@@ -41,11 +36,15 @@ const Home = () => {
       </p>
       <p>Twoje role: {user?.roles?.join(', ')}</p>
 
-      <UserTable onCreateClick={openModal} />
+      <UserTable
+        onCreateClick={() => setModalOpen(true)}
+        users={users}
+        loading={loading}
+      />
       <UserCreateModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        onCreate={handleCreateUser}
+        onCreate={ createUser }
       />
     </div>
   );

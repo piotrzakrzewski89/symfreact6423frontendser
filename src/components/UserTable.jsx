@@ -4,18 +4,54 @@ import { Box, Button, Typography } from '@mui/material';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const UserTable = ({onCreateClick }) => {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-
+const UserTable = ({ onCreateClick, users, loading }) => {
   const columns = [
     {
       accessorKey: 'id',
       header: 'ID',
     },
     {
+      accessorKey: 'uuid',
+      header: 'UUID',
+    },
+    {
       accessorKey: 'email',
       header: 'Email',
+    },
+    {
+      accessorKey: 'firstName',
+      header: 'Imię',
+    },
+    {
+      accessorKey: 'lastName',
+      header: 'Nazwisko',
+    },
+    {
+      accessorKey: 'createdAt',
+      header: 'Utworzony',
+      Cell: ({ cell }) => new Date(cell.getValue()).toLocaleString(),
+    },
+    {
+      accessorKey: 'updatedAt',
+      header: 'Zaktualizowany',
+      Cell: ({ cell }) =>
+        cell.getValue() ? new Date(cell.getValue()).toLocaleString() : '',
+    },
+    {
+      accessorKey: 'deletedAt',
+      header: 'Usunięty',
+      Cell: ({ cell }) =>
+        cell.getValue() ? new Date(cell.getValue()).toLocaleString() : '',
+    },
+    {
+      accessorKey: 'lastLogin',
+      header: 'Ostatnie logowanie',
+      Cell: ({ cell }) =>
+        cell.getValue() ? new Date(cell.getValue()).toLocaleString() : '',
+    },
+    {
+      accessorKey: 'employeeNumber',
+      header: 'Nr pracownika',
     },
     {
       accessorKey: 'roles',
@@ -23,19 +59,11 @@ const UserTable = ({onCreateClick }) => {
       Cell: ({ cell }) => cell.getValue().join(', '),
     },
     {
-      accessorKey: 'is_active',
+      accessorKey: 'isActive',
       header: 'Aktywny',
       Cell: ({ cell }) => (cell.getValue() ? '✅' : '❌'),
     },
   ];
-
-  useEffect(() => {
-    fetch(`${API_URL}/api/list-users`)
-      .then(res => res.json())
-      .then(data => setUsers(data))
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
 
   return (
     <Box sx={{ p: 3 }}>
@@ -53,6 +81,26 @@ const UserTable = ({onCreateClick }) => {
         columns={columns}
         data={users}
         state={{ isLoading: loading }}
+        enableColumnResizing
+        enableColumnOrdering
+        enableColumnFilters
+        enableHiding // <-- pozwala użytkownikowi ukrywać/pokazywać kolumny
+        initialState={{
+          columnVisibility: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            uuid: true,
+            createdAt: false,
+            updatedAt: false,
+            deletedAt: false,
+            lastLogin: false,
+            employeeNumber: true,
+            roles: false,
+            isActive: true,
+          },
+        }}
       />
     </Box>
   );

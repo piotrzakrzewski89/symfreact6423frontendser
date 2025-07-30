@@ -6,63 +6,18 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 const UserTable = ({ onCreateClick, users, loading }) => {
   const columns = [
-    {
-      accessorKey: 'id',
-      header: 'ID',
-    },
-    {
-      accessorKey: 'uuid',
-      header: 'UUID',
-    },
-    {
-      accessorKey: 'email',
-      header: 'Email',
-    },
-    {
-      accessorKey: 'firstName',
-      header: 'Imię',
-    },
-    {
-      accessorKey: 'lastName',
-      header: 'Nazwisko',
-    },
-    {
-      accessorKey: 'createdAt',
-      header: 'Utworzony',
-      Cell: ({ cell }) => new Date(cell.getValue()).toLocaleString(),
-    },
-    {
-      accessorKey: 'updatedAt',
-      header: 'Zaktualizowany',
-      Cell: ({ cell }) =>
-        cell.getValue() ? new Date(cell.getValue()).toLocaleString() : '',
-    },
-    {
-      accessorKey: 'deletedAt',
-      header: 'Usunięty',
-      Cell: ({ cell }) =>
-        cell.getValue() ? new Date(cell.getValue()).toLocaleString() : '',
-    },
-    {
-      accessorKey: 'lastLogin',
-      header: 'Ostatnie logowanie',
-      Cell: ({ cell }) =>
-        cell.getValue() ? new Date(cell.getValue()).toLocaleString() : '',
-    },
-    {
-      accessorKey: 'employeeNumber',
-      header: 'Nr pracownika',
-    },
-    {
-      accessorKey: 'roles',
-      header: 'Role',
-      Cell: ({ cell }) => cell.getValue().join(', '),
-    },
-    {
-      accessorKey: 'isActive',
-      header: 'Aktywny',
-      Cell: ({ cell }) => (cell.getValue() ? '✅' : '❌'),
-    },
+    { accessorKey: 'id', header: 'ID' },
+    { accessorKey: 'uuid', header: 'UUID' },
+    { accessorKey: 'email', header: 'Email' },
+    { accessorKey: 'firstName', header: 'Imię' },
+    { accessorKey: 'lastName', header: 'Nazwisko' },
+    { accessorKey: 'createdAt', header: 'Utworzony', Cell: ({ cell }) => new Date(cell.getValue()).toLocaleString() },
+    { accessorKey: 'updatedAt', header: 'Zaktualizowany', Cell: ({ cell }) => cell.getValue() ? new Date(cell.getValue()).toLocaleString() : '' },
+    { accessorKey: 'deletedAt', header: 'Usunięty', Cell: ({ cell }) => cell.getValue() ? new Date(cell.getValue()).toLocaleString() : '' },
+    { accessorKey: 'lastLogin', header: 'Ostatnie logowanie', Cell: ({ cell }) => cell.getValue() ? new Date(cell.getValue()).toLocaleString() : '' },
+    { accessorKey: 'employeeNumber', header: 'Nr pracownika' },
+    { accessorKey: 'roles', header: 'Role', Cell: ({ cell }) => cell.getValue().join(', ') },
+    { accessorKey: 'isActive', header: 'Aktywny', Cell: ({ cell }) => (cell.getValue() ? '✅' : '❌') },
   ];
 
   return (

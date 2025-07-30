@@ -1,6 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
-    Box, Button, Modal, TextField, Checkbox, FormControlLabel, Typography, MenuItem
+    Box,
+    Button,
+    Modal,
+    TextField,
+    Checkbox,
+    FormControlLabel,
+    Typography,
 } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -34,21 +40,13 @@ const userSchema = yup.object().shape({
     isActive: yup.boolean(),
 });
 
-const passwordRequirements = [
-    { label: "Mała litera", test: (pw) => /[a-z]/.test(pw) },
-    { label: "Wielka litera", test: (pw) => /[A-Z]/.test(pw) },
-    { label: "Cyfra", test: (pw) => /\d/.test(pw) },
-    { label: "Znak specjalny", test: (pw) => /[!@#$%^&*(),.?":{}|<>]/.test(pw) },
-    { label: "Min. 8 znaków", test: (pw) => pw.length >= 8 },
-];
-
 const UserCreateModal = ({ open, onClose, onCreate }) => {
     const {
         register,
         handleSubmit,
         reset,
-        watch,
         formState: { errors },
+        watch,
     } = useForm({
         resolver: yupResolver(userSchema),
         defaultValues: {
@@ -57,6 +55,14 @@ const UserCreateModal = ({ open, onClose, onCreate }) => {
     });
 
     const password = watch('password', '');
+
+    const passwordRequirements = [
+        { label: "Mała litera", test: (pw) => /[a-z]/.test(pw) },
+        { label: "Wielka litera", test: (pw) => /[A-Z]/.test(pw) },
+        { label: "Cyfra", test: (pw) => /\d/.test(pw) },
+        { label: "Znak specjalny", test: (pw) => /[!@#$%^&*(),.?":{}|<>]/.test(pw) },
+        { label: "Min. 8 znaków", test: (pw) => pw.length >= 8 },
+    ];
 
     const onSubmit = (data) => {
         onCreate(data);
@@ -140,18 +146,15 @@ const UserCreateModal = ({ open, onClose, onCreate }) => {
                 />
 
                 <FormControlLabel
-                    control={
-                        <Checkbox
-                            defaultChecked={true}
-                            {...register("isActive")}
-                        />
-                    }
+                    control={<Checkbox {...register('isActive')} defaultChecked />}
                     label="Aktywny"
                 />
 
                 <Box mt={3} display="flex" justifyContent="flex-end" gap={2}>
                     <Button onClick={onClose}>Anuluj</Button>
-                    <Button type="submit" variant="contained" color="primary">Utwórz</Button>
+                    <Button type="submit" variant="contained" color="primary">
+                        Utwórz
+                    </Button>
                 </Box>
             </Box>
         </Modal>
